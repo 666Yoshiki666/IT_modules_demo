@@ -1,0 +1,28 @@
+#配置数据
+
+#MYSQL
+[DATABASE]
+host =localhost
+username = root
+password = 123456
+port = 3306
+database = databasename
+
+#URL
+[HTTP]
+url = https://www.baidu.com
+port = None
+timeout = 1
+
+#EMAIL
+[EMAIL]
+mail_host = 24905833862@qq.com
+mail_user = 24905833862@qq.com
+mail_pass = parkchoah66
+mail_port = 25
+sender = 24905833862@qq.com
+receiver = 24905833862@qq.com
+subject = python
+content = "All interface test has been complited\nplease read the report file about the detile of result in the attachment."
+testuser = Someone
+on_off = 1
