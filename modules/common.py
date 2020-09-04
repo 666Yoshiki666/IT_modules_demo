@@ -57,6 +57,42 @@ class GainData:
             xml_path = os.path.join(self.file_path_catalogue, xml_file)
             #解析xml文件为元素树
             tree = ElementTree.parse(source=xml_path)
-            print('tree：{}'.format(tree))
-            data = tree.findall(path='database')
-            print('data：{}'.format(data))
+            #获取根节点
+            root = tree.getroot()
+            '''
+            <page>xxx</page>这种结构称为一个element
+            page称作element的tag
+            <></>之间的内容称作element的text或data
+            <>中的name称作element的attrib
+            整个XML树被称作ElementTree
+            
+            root.tag #root element的tag
+            root.text #root element的text
+            root.attrib #root element本身的attrib,dict格式的
+            root.tail #root element的tag结束到下一个tag之间的text
+            
+            DICT逻辑获取树形结构的text
+            root[0][0][0].text
+            '''
+            # if str(root.text) != '' and str(root.text).isalnum():
+            #     self.database[root.get(key='name')] = str(root.text)
+            #     print(self.database)
+            # else:
+            #     print('xml文件没有可取数据！')
+            '''
+            .iter(tag) #遍历tree中指定tag
+            .strip() #去除首尾空格
+            .get(key) #当前element中获取符合指定attrib名的value
+            '''
+            databases = root.iter(tag='database')
+            for d in databases:
+                table = {}
+                tables = root.iter(tag='table')
+                for t in tables:
+                    sql = {}
+                    sqls = root.iter(tag='sql')
+                    for s in sqls:
+                        sql[str(s.get(key='id'))] = str(s.text).strip()
+                    table[str(t.get(key='name'))] = sql
+                self.database[str(d.get(key='name'))] = table
+        return self.database

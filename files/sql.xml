@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <page>
-	<database name="newsitetest">
-		<table name="rs_member_wallet_bill">
-			<sql id="select_member">
-				SELECT * FROM rs_member_wallet_bill WHERE member_id = %s
+	<database name="it_data">
+		<table name="personage_testdata">
+			<sql id="select_personage_all">
+				SELECT * FROM personage_testdata
+			</sql>
+			<sql id="select_personage_age">
+				SELECT * FROM personage_testdata WHERE age > %s
 			</sql>
 			<sql id="delete_user">
-				DELETE * FROM rs_member WHERE member_id = %s
+				DELETE * FROM personage_testdata WHERE d = %s
 			</sql>
 		</table>
 	</database>
