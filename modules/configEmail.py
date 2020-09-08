@@ -14,6 +14,7 @@ from datetime import datetime
 #email库构建邮件
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from modules.most_new_log import NewLog
 from modules.readConfig import ReadConfig
 from modules.logManagement import LogInstrument
 
@@ -21,7 +22,7 @@ class Email:
 
     def __init__(self):
         rc = ReadConfig()
-        global send, title, reception, text, result_path, host, user, password
+        global send, title, reception, text, result_path, host, port, user, password
         #获取发送者信息
         send = rc.get_EMAIL('from')
         #获取邮件标题
@@ -33,44 +34,53 @@ class Email:
         #
         host = rc.get_EMAIL('host_qqy')
         #
-        user = rc.get_EMAIL('user')
+        port = rc.get_EMAIL('port')
+        #
+        user = rc.get_EMAIL('user_qqy')
         #
         password = rc.get_EMAIL('pass_qqy')
         #获取结果日志所在目录
         real_catalogue = os.path.realpath(path='D:\pycharm\IT_modules_demo')
-        result_path = os.path.join(real_catalogue, 'result')
+        time_now = datetime.now().strftime('%Y%m%d')
+        result_path = os.path.join(real_catalogue, 'result', time_now)
+        #需要发送文件
+        new_file = NewLog().get_newLog(catalog_path=result_path)
         #
         self.logger = LogInstrument.get_log().logger
         #初始化邮件头字段基类
         self.msg = MIMEMultipart()
 
+    #邮件头信息
     def config_header(self):
         #邮件发送时间
         self.msg['Data'] = datetime.now().strftime('%Y-%m-%d %H-%M-%S')
         self.msg['From'] = send
         self.msg['Subject'] = title
-        self.msg['To'] = ', ' + reception
+        self.msg['To'] = reception
 
+    #添加需要发送的信息
     def config_content(self):
         content_plain = MIMEText(_text=text, _charset='UTF-8')
-        #将给定的有效负载添加到当前有效负载
+        #将给定的有效负载添加到当前有效负载（即添加邮件体信息）
         self.msg.attach(content_plain)
 
+    #判断文件是否存在
     def config_file(self):
         if os.path.isfile(path=result_path) and not os.stat(path=result_path):
             return True
         else:
             return False
 
+    #发送邮件
     def send_email(self):
         self.config_header()
         self.config_content()
         self.config_file()
         try:
             smtp = smtplib.SMTP()
-            smtp.connect(host=host)
+            smtp.connect(host=host, port=port)
             smtp.login(user=user, password=password)
-            smtp.sendmail(from_addr=send, to_addrs=None, msg=self.msg.as_string())
+            smtp.sendmail(from_addr=send, to_addrs=reception, msg=self.msg.as_string())
             smtp.quit()
             self.logger.info('测试报告已通过电子邮件发送给开发人员啦~')
         except Exception as ex:

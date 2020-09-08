@@ -22,7 +22,7 @@ class Log:
             #创建result目录
             os.mkdir(result_path)
         #获取测试结果存放分目录
-        log_path = os.path.join(result_path, str(datetime.now().strftime('%Y%m%d%H%M%S')))
+        log_path = os.path.join(result_path, str(datetime.now().strftime('%Y%m%d')))
         #判断测试结果存放分目录是否不存在
         if not os.path.exists(log_path):
             #创建分目录
