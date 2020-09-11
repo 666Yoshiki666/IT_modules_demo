@@ -11,7 +11,13 @@ class NewLog:
 
     @staticmethod
     def get_newLog(catalog_path):
-        files = os.listdir(catalog_path)
+        if catalog_path == None or catalog_path == '':
+            return '访问地址为空！请确认文件地址！'
+
+        try:
+            files = os.listdir(catalog_path)
+        except FileNotFoundError as fnfe:
+            return print('FileNotFoundError异常：{}'.format(fnfe))
         file_names = []
         for i in files:
             file_path = os.path.join(catalog_path, i)
@@ -20,6 +26,8 @@ class NewLog:
         flag = True
         temp = None
         i = 0
+        if file_names == []:
+            return print('没有搜索到文件！')
         while flag:
             if temp == None:
                 temp = file_names[i]

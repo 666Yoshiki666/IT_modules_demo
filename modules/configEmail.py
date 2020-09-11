@@ -22,7 +22,7 @@ class Email:
 
     def __init__(self):
         rc = ReadConfig()
-        global send, title, reception, text, result_path, host, port, user, password
+        global send, title, reception, text, result_path, host, port, user, password, send_file_path
         #获取发送者信息
         send = rc.get_EMAIL('from')
         #获取邮件标题
@@ -43,8 +43,12 @@ class Email:
         real_catalogue = os.path.realpath(path='D:\pycharm\IT_modules_demo')
         time_now = datetime.now().strftime('%Y%m%d')
         result_path = os.path.join(real_catalogue, 'result', time_now)
-        #需要发送文件
+        #需要发送文件地址
         new_file = NewLog().get_newLog(catalog_path=result_path)
+        if new_file == None or new_file == '':
+            send_file_path = None
+        else:
+            send_file_path = os.path.join(result_path, new_file)
         #
         self.logger = LogInstrument.get_log().logger
         #初始化邮件头字段基类
@@ -61,8 +65,18 @@ class Email:
     #添加需要发送的信息
     def config_content(self):
         content_plain = MIMEText(_text=text, _charset='UTF-8')
+        #附件
+        new_file = None
+        if send_file_path == None:
+            new_file = '附件不存在！'
+        else:
+            new_file = open(file=send_file_path, mode='rb').read()
+        accessory = MIMEText(_text=new_file, _subtype='BASE64', _charset='UTF-8')
+        accessory['Content-Type'] = 'application/octet-stream'
+        accessory['Content-Disposition'] = 'attachment;filename="logo.log"'
         #将给定的有效负载添加到当前有效负载（即添加邮件体信息）
         self.msg.attach(content_plain)
+        self.msg.attach(accessory)
 
     #判断文件是否存在
     def config_file(self):
@@ -82,7 +96,7 @@ class Email:
             smtp.login(user=user, password=password)
             smtp.sendmail(from_addr=send, to_addrs=reception, msg=self.msg.as_string())
             smtp.quit()
-            self.logger.info('测试报告已通过电子邮件发送给开发人员啦~')
+            self.logger.info('测试报告已通过电子邮件成功发送啦~')
         except Exception as ex:
             self.logger.error('邮件发送失败！报异常：{}'.format(str(ex)))
 
